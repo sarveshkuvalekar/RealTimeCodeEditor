@@ -2,16 +2,31 @@ import express from "express";
 import http from 'http';
 import { Server } from "socket.io";
 import axios from "axios";
+//Deployment-code
+import path from "path";
+//Deployment-code
 
 const app = express();
 
 const server = http.createServer(app);
 
+// const io = new Server(server, {
+//     cors: {
+//         origin: "*",
+//     },
+// });
+
+//Deployment-code
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: process.env.NODE_ENV === 'production' 
+            ? ["https://livecodelab.onrender.com"] 
+            : ["http://localhost:3000", "http://localhost:5173"],
+        methods: ["GET", "POST"],
+        credentials: true
     },
 });
+//Deployment-code
 
 const rooms = new Map();
 
@@ -128,6 +143,16 @@ const port = process.env.PORT || 5000;
 //   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 // });
 
+const __dirname = path.resolve();
+
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+// Catch all handler: send back React's index.html file for any non-API routes
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
+
 server.listen(port, () => {
-  console.log("server is working on port 5000");
+    console.log(`Server is running on port ${port}`);
 });

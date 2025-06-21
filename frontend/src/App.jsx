@@ -5,7 +5,14 @@ import logo from './assets/logo.png'
 import Editor from '@monaco-editor/react';
 import { v4 as uuid } from 'uuid';
 
-const socket = io("http://localhost:5000")
+// const socket = io("http://localhost:5000")
+
+//Deployment code
+const socket = io(process.env.NODE_ENV === 'production' 
+    ? 'https://livecodelab.onrender.com'  // Replace with your actual Render app URL
+    : "http://localhost:5000"
+);
+//Deployment code
 
 const App = () => {
   const [joined, setJoined] = useState(false);
